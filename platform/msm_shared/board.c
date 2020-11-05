@@ -285,6 +285,10 @@ static void platform_detect()
 		dprintf(CRITICAL, "Unsupported board info format %u.%u\n", format_major, format_minor);
 		ASSERT(0);
 	}
+
+	board.platform_hw = 0xb;
+	board.platform_subtype = 0x1;
+	board.target = 0x10008;
 }
 
 void pmic_info_populate()
