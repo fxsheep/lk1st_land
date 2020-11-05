@@ -171,7 +171,7 @@ void target_sdc_init()
 	config.pwr_irq       = mmc_sdc_pwrctl_irq[config.slot - 1];
 	config.hs400_support = 1;
 
-	if (!(dev = mmc_init(&config))) {
+//	if (!(dev = mmc_init(&config))) {
 	/* Try slot 2 */
 		config.slot          = 2;
 		config.max_clk_rate  = MMC_CLK_200MHZ;
@@ -184,7 +184,7 @@ void target_sdc_init()
 			dprintf(CRITICAL, "mmc init failed!");
 			ASSERT(0);
 		}
-	}
+//	}
 }
 
 void *target_mmc_device()
