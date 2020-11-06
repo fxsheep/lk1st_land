@@ -305,6 +305,40 @@ extern int emmc_recovery_init(void);
 extern int fastboot_trigger(void);
 #endif
 
+void fastboot_send_string(const void* _data, size_t size) {
+	uint32_t i;
+	char buf[MAX_RSP_SIZE];
+	const uint8_t* data = _data;
+
+	for(i=0; i<size; i+=MAX_RSP_SIZE-5) {
+		uint32_t copysize = MIN(size-i, MAX_RSP_SIZE-5);
+		memcpy(buf, &data[i], copysize);
+		buf[copysize] = 0;
+		fastboot_info(buf);
+	}
+}
+
+void fastboot_send_string_human(const void* _data, size_t size) {
+	uint32_t i;
+	char buf[MAX_RSP_SIZE];
+	size_t pos = 0;
+	const char* data = _data;
+
+	if(size==0)
+		size=strlen(data);
+
+	for(i=0; i<size; i++) {
+		char c = data[i];
+		buf[pos++] = c;
+
+		if(pos==sizeof(buf)-1-4 || i==size-1 || c=='\n' || c=='\r') {
+			buf[pos] = 0;
+			fastboot_info(buf);
+			pos = 0;
+		}
+	}
+}
+
 static void update_ker_tags_rdisk_addr(struct boot_img_hdr *hdr, bool is_arm64)
 {
 	/* overwrite the destination of specified for the project */
@@ -3885,6 +3919,14 @@ bool is_device_locked()
 	return device.is_unlocked ? false:true;
 }
 
+#if WITH_DEBUG_LOG_BUF
+static void cmd_oem_lk_log(const char *arg, void *data, unsigned sz)
+{
+	fastboot_send_string_human(lk_log_getbuf(), lk_log_getsize());
+	fastboot_okay("");
+}
+#endif
+
 /* register commands and variables for fastboot */
 void aboot_fastboot_register_commands(void)
 {
@@ -3968,6 +4010,9 @@ void aboot_fastboot_register_commands(void)
 	update_battery_status();
 	fastboot_publish("battery-voltage", (const char *) battery_voltage);
 	fastboot_publish("battery-soc-ok", (const char *) battery_soc_ok);
+#endif
+#if WITH_DEBUG_LOG_BUF
+	fastboot_register("oem lk_log", cmd_oem_lk_log);
 #endif
 }
 
