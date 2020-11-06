@@ -6,11 +6,8 @@ TARGET := msm8952
 
 MODULES += app/aboot
 
-ifeq ($(TARGET_BUILD_VARIANT),user)
-DEBUG := 0
-else
-DEBUG := 1
-endif
+DEBUG := 9
+DEFINES += LK_LOG_BUF_SIZE=16384
 
 EMMC_BOOT := 1
 
