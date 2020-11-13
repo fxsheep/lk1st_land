@@ -291,11 +291,7 @@ void shutdown_device()
 
 void target_init(void)
 {
-#if VERIFIED_BOOT
-#if !VBOOT_MOTA
 	int ret = 0;
-#endif
-#endif
 	dprintf(INFO, "target_init()\n");
 
 	spmi_init(PMIC_ARB_CHANNEL_NUM, PMIC_ARB_OWNER_ID);
@@ -336,8 +332,6 @@ void target_init(void)
 	if (target_use_signed_kernel())
 		target_crypto_init_params();
 
-#if VERIFIED_BOOT
-#if !VBOOT_MOTA
 	clock_ce_enable(CE1_INSTANCE);
 
 	/* Initialize Qseecom */
@@ -346,7 +340,7 @@ void target_init(void)
 	if (ret < 0)
 	{
 		dprintf(CRITICAL, "Failed to initialize qseecom, error: %d\n", ret);
-		ASSERT(0);
+//		ASSERT(0);
 	}
 
 	/* Start Qseecom */
@@ -355,13 +349,13 @@ void target_init(void)
 	if (ret < 0)
 	{
 		dprintf(CRITICAL, "Failed to start qseecom, error: %d\n", ret);
-		ASSERT(0);
+//		ASSERT(0);
 	}
 
 	if (rpmb_init() < 0)
 	{
 		dprintf(CRITICAL, "RPMB init failed\n");
-		ASSERT(0);
+//		ASSERT(0);
 	}
 
 	/*
@@ -370,10 +364,8 @@ void target_init(void)
 	if (load_sec_app() < 0)
 	{
 		dprintf(CRITICAL, "Failed to load App for verified\n");
-		ASSERT(0);
+//		ASSERT(0);
 	}
-#endif
-#endif
 
 #if SMD_SUPPORT
 	rpm_smd_init();
@@ -571,26 +563,22 @@ void target_uninit(void)
 	if (target_is_ssd_enabled())
 		clock_ce_disable(CE1_INSTANCE);
 
-#if VERIFIED_BOOT
-#if !VBOOT_MOTA
 	if (is_sec_app_loaded())
 	{
 		if (send_milestone_call_to_tz() < 0)
 		{
 			dprintf(CRITICAL, "Failed to unload App for rpmb\n");
-			ASSERT(0);
+//			ASSERT(0);
 		}
 	}
 
 	if (rpmb_uninit() < 0)
 	{
 		dprintf(CRITICAL, "RPMB uninit failed\n");
-		ASSERT(0);
+//		ASSERT(0);
 	}
 
 	clock_ce_disable(CE1_INSTANCE);
-#endif
-#endif
 
 #if SMD_SUPPORT
 	rpm_smd_uninit();
