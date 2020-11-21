@@ -40,6 +40,12 @@ _start:
 
 reset:
 
+	/* if in HYP mode, move to SVC */
+	mrs		r12, cpsr
+	and		r12, r12, #0x1f
+	cmp		r12, #0x1a
+	bleq		arm32_hyp_to_svc
+
 #ifdef ENABLE_TRUSTZONE
 	/*Add reference to TZ symbol so linker includes it in final image */
 	ldr r7, =_binary_tzbsp_tzbsp_bin_start
@@ -173,13 +179,21 @@ warm_boot_tag:
 	strlt	r2, [r0], #4
 	blt		.L__bss_loop
 
-#ifdef ARM_CPU_CORTEX_A8
+#if	ARM_CPU_CORTEX_A8 || ARM_CPU_CORTEX_A7
 	DSB
 	ISB
 #endif
 
 	bl		kmain
 	b		.
+
+arm32_hyp_to_svc:
+	mrs		r12, cpsr
+	bic		r12, #0x1f      // clear mode bits
+	orr		r12, r12, #0x13 // set mode bits to SVC
+	msr		SPSR_hyp, r12
+	msr		ELR_hyp, lr
+	eret            		// "restore" the mode, and return
 
 .ltorg
 

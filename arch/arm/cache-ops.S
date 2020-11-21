@@ -116,7 +116,7 @@ FUNCTION(arch_enable_cache)
 	msr		cpsr, r3
 	bx		lr
 
-#elif ARM_CPU_CORTEX_A8
+#elif ARM_CPU_CORTEX_A8 || ARM_CPU_CORTEX_A7
 
 /* void arch_disable_cache(uint flags) */
 FUNCTION(arch_disable_cache)
@@ -308,7 +308,7 @@ invalidate_cache_v7:
 #error unhandled cpu
 #endif
 
-#if ARM_CPU_ARM926 || ARM_CPU_ARM1136 || ARM_CPU_CORTEX_A8
+#if ARM_CPU_ARM926 || ARM_CPU_ARM1136 || ARM_CPU_CORTEX_A8 || ARM_CPU_CORTEX_A7
 /* shared cache flush routines */
 
 	/* void arch_flush_cache_range(addr_t start, size_t len); */

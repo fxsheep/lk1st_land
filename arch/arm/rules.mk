@@ -8,6 +8,21 @@ DEFINES += \
 
 # do set some options based on the cpu core
 HANDLED_CORE := false
+ifeq ($(ARM_CPU),cortex-a7)
+DEFINES += \
+	ARM_WITH_CP15=1 \
+	ARM_WITH_MMU=1 \
+	ARM_ISA_ARMv7=1 \
+	ARM_ISA_ARMv7A=1 \
+	ARM_WITH_VFP=1 \
+	ARM_WITH_NEON=1 \
+	ARM_WITH_THUMB=1 \
+	ARM_WITH_THUMB2=1 \
+	ARM_WITH_CACHE=1 \
+	ARM_WITH_HYP=1
+CFLAGS += -mcpu=$(ARM_CPU)
+HANDLED_CORE := true
+endif
 ifeq ($(ARM_CPU),cortex-a8)
 DEFINES += \
 	ARM_WITH_CP15=1 \

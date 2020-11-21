@@ -2,7 +2,7 @@ LOCAL_DIR := $(GET_LOCAL_DIR)
 
 ARCH    := arm
 #Compiling this as cortex-a8 until the compiler supports krait
-ARM_CPU := cortex-a8
+ARM_CPU := cortex-a7
 CPU     := generic
 
 DEFINES += ARM_CPU_CORE_A7

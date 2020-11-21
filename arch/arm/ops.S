@@ -195,7 +195,7 @@ FUNCTION(atomic_or)
 
 /* void arch_idle(); */
 FUNCTION(arch_idle)
-#if ARM_CPU_CORTEX_A8
+#if ARM_CPU_CORTEX_A8 || ARM_CPU_CORTEX_A7
 	wfi
 #elif ARM_CPU_ARM1136 || ARM_CPU_ARM926
 	mov	r0, #0
@@ -215,7 +215,7 @@ FUNCTION(arm_read_cr1)
 /* void arm_write_cr1(uint32_t val) */
 FUNCTION(arm_write_cr1)
 	mcr		p15, 0, r0, c1, c0, 0
-#if ARM_CPU_CORTEX_A8
+#if ARM_CPU_CORTEX_A8 || ARM_CPU_CORTEX_A7
 	isb		sy
 #elif ARM_CPU_ARM1136
 	mov		r0, #0
@@ -249,13 +249,13 @@ FUNCTION(arm_invalidate_tlb)
 	isb
 	mov		r0, #0
 	mcr	p15, 0, r0, c8, c7, 0
-#if ARM_CPU_CORTEX_A8
+#if ARM_CPU_CORTEX_A8 || ARM_CPU_CORTEX_A7
 	dsb		sy
 #elif ARM_CPU_ARM1136
 	mov		r0, #0
 	mcr		p15, 0, r0, c7, c10, 4
 #endif
-#if ARM_CPU_CORTEX_A8
+#if ARM_CPU_CORTEX_A8 || ARM_CPU_CORTEX_A7
 	isb		sy
 #elif ARM_CPU_ARM1136
 	mov		r0, #0
@@ -270,7 +270,7 @@ FUNCTION(arch_switch_stacks_and_call)
 
 /*void dmb(void) */
 FUNCTION(dmb)
-#if ARM_CPU_CORTEX_A8
+#if ARM_CPU_CORTEX_A8 || ARM_CPU_CORTEX_A7
 	dmb		sy
 #elif ARM_CPU_ARM1136
 	mov		r0, #0
@@ -283,7 +283,7 @@ FUNCTION(arm_read_cycle_count)
 
 /* uint32_t arch_cycle_count(void); */
 FUNCTION(arch_cycle_count)
-#if ARM_CPU_CORTEX_A8
+#if ARM_CPU_CORTEX_A8 || ARM_CPU_CORTEX_A7
 	mrc		p15, 0, r0, c9, c13, 0
 #else
 	mov		r0, #0
