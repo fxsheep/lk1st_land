@@ -317,3 +317,8 @@ FUNCTION(cpu_on_asm)
 FUNCTION(cpu_on_asm)
     bx lr
 #endif
+
+#if ARM_WITH_HYP
+FUNCTION(hyp_jump)
+   hvc  #0 
+#endif

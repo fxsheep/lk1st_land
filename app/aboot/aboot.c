@@ -110,6 +110,9 @@ extern void platform_uninit(void);
 extern void target_uninit(void);
 extern int get_target_boot_params(const char *cmdline, const char *part,
 				  char **buf);
+#if ARM_WITH_HYP
+extern int is_booted_in_hyp;
+#endif
 
 void *info_buf;
 void write_device_info_mmc(device_info *dev);
@@ -303,6 +306,10 @@ extern int emmc_recovery_init(void);
 
 #if NO_KEYPAD_DRIVER
 extern int fastboot_trigger(void);
+#endif
+
+#if ARM_WITH_HYP
+extern void hyp_jump(addr_t addr, unsigned machtype, unsigned* tags_phys);
 #endif
 
 void fastboot_send_string(const void* _data, size_t size) {
@@ -934,6 +941,12 @@ void boot_linux(void *kernel, unsigned *tags,
 	if (IS_ARM64(kptr))
 		/* Jump to a 64bit kernel */
 		scm_elexec_call((paddr_t)kernel, tags_phys);
+
+#if ARM_WITH_HYP
+	else if(is_booted_in_hyp)
+		/* Jump to a 32bit kernel via HYP */
+		hyp_jump(PA((addr_t)kernel), machtype, (unsigned*)tags_phys);
+#endif
 	else
 		/* Jump to a 32bit kernel */
 		entry(0, machtype, (unsigned*)tags_phys);

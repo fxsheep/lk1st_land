@@ -23,6 +23,44 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/* Hyp Syndrome Register (HSR) bits */
+#define HSR_EC_SHIFT	(26)
+#define HSR_EC		(0x3fU << HSR_EC_SHIFT)
+#define HSR_IL		(1U << 25)
+#define HSR_ISS		(HSR_IL - 1)
+#define HSR_ISV_SHIFT	(24)
+#define HSR_ISV		(1U << HSR_ISV_SHIFT)
+#define HSR_SRT_SHIFT	(16)
+#define HSR_SRT_MASK	(0xf << HSR_SRT_SHIFT)
+#define HSR_FSC		(0x3f)
+#define HSR_FSC_TYPE	(0x3c)
+#define HSR_SSE		(1 << 21)
+#define HSR_WNR		(1 << 6)
+#define HSR_CV_SHIFT	(24)
+#define HSR_CV		(1U << HSR_CV_SHIFT)
+#define HSR_COND_SHIFT	(20)
+#define HSR_COND	(0xfU << HSR_COND_SHIFT)
+
+#define HSR_EC_UNKNOWN	(0x00)
+#define HSR_EC_WFI	(0x01)
+#define HSR_EC_CP15_32	(0x03)
+#define HSR_EC_CP15_64	(0x04)
+#define HSR_EC_CP14_MR	(0x05)
+#define HSR_EC_CP14_LS	(0x06)
+#define HSR_EC_CP_0_13	(0x07)
+#define HSR_EC_CP10_ID	(0x08)
+#define HSR_EC_JAZELLE	(0x09)
+#define HSR_EC_BXJ	(0x0A)
+#define HSR_EC_CP14_64	(0x0C)
+#define HSR_EC_SVC_HYP	(0x11)
+#define HSR_EC_HVC	(0x12)
+#define HSR_EC_SMC	(0x13)
+#define HSR_EC_IABT	(0x20)
+#define HSR_EC_IABT_HYP	(0x21)
+#define HSR_EC_DABT	(0x24)
+#define HSR_EC_DABT_HYP	(0x25)
+#define HSR_EC_MAX	(0x3f)
+
 #define DSB .byte 0x4f, 0xf0, 0x7f, 0xf5
 #define ISB .byte 0x6f, 0xf0, 0x7f, 0xf5
 
@@ -65,7 +103,10 @@ hyp_data_abort:
         b       hyp_data_abort
 
 hyp_hvc:
-        b       hyp_hvc
+	mov	r5, r0
+	mov	r0, #0
+	mov	pc, r5
+	b	.
 
 hyp_irq:
         b       hyp_irq
@@ -222,15 +263,26 @@ warm_boot_tag:
 	bl		kmain
 	b		.
 
+#if ARM_WITH_HYP
+
 arm32_hyp_install_and_move_to_svc:
 	ldr		r0,  =hyp_vector
 	mcr             p15, 4, r0, c12, c0, 0	
+	ldr		r0,  =hyp_stack_top
+	ldr		r0,  =is_booted_in_hyp
+	mov		r1,  #1
+	str		r1,  [r0]
+	mov		sp,  r0
 	mrs		r12, cpsr
 	bic		r12, #0x1f      // clear mode bits
 	orr		r12, r12, #0x13 // set mode bits to SVC
 	msr		SPSR_hyp, r12
 	msr		ELR_hyp, lr
 	eret            		// "restore" the mode, and return
+
+.globl is_booted_in_hyp
+	is_booted_in_hyp:
+#endif
 
 .ltorg
 
@@ -244,6 +296,10 @@ arm32_hyp_install_and_move_to_svc:
 abort_stack:
 	.skip 1024
 abort_stack_top:
+
+hyp_stack:
+        .skip 1024
+hyp_stack_top:
 
 #if SECONDARY_CPU_SUPPORT
 /* secondary cpu stack */
