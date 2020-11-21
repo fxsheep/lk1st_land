@@ -38,13 +38,48 @@ _start:
 	b	arm_irq
 	b	arm_fiq
 
+.globl hyp_vector
+hyp_vector:
+        b       hyp_reset
+        b       hyp_undefined
+        b       hyp_syscall
+        b       hyp_prefetch_abort
+        b       hyp_data_abort
+        b       hyp_hvc
+        b       hyp_irq
+        b       hyp_fiq
+
+hyp_reset:
+        b       hyp_reset
+
+hyp_undefined:
+        b       hyp_undefined
+
+hyp_syscall:
+        b       hyp_syscall
+
+hyp_prefetch_abort:
+        b       hyp_prefetch_abort
+
+hyp_data_abort:
+        b       hyp_data_abort
+
+hyp_hvc:
+        b       hyp_hvc
+
+hyp_irq:
+        b       hyp_irq
+
+hyp_fiq:
+        b       hyp_fiq
+
 reset:
 
-	/* if in HYP mode, move to SVC */
+	/* if in HYP mode, set HVBAR and move to SVC */
 	mrs		r12, cpsr
 	and		r12, r12, #0x1f
 	cmp		r12, #0x1a
-	bleq		arm32_hyp_to_svc
+	bleq		arm32_hyp_install_and_move_to_svc
 
 #ifdef ENABLE_TRUSTZONE
 	/*Add reference to TZ symbol so linker includes it in final image */
@@ -187,7 +222,9 @@ warm_boot_tag:
 	bl		kmain
 	b		.
 
-arm32_hyp_to_svc:
+arm32_hyp_install_and_move_to_svc:
+	ldr		r0,  =hyp_vector
+	mcr             p15, 4, r0, c12, c0, 0	
 	mrs		r12, cpsr
 	bic		r12, #0x1f      // clear mode bits
 	orr		r12, r12, #0x13 // set mode bits to SVC
