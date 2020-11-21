@@ -76,6 +76,7 @@ _start:
 	b	arm_irq
 	b	arm_fiq
 
+#if ARM_WITH_HYP
 .globl hyp_vector
 hyp_vector:
         b       hyp_reset
@@ -113,6 +114,8 @@ hyp_irq:
 
 hyp_fiq:
         b       hyp_fiq
+
+#endif
 
 reset:
 
@@ -280,6 +283,7 @@ arm32_hyp_install_and_move_to_svc:
 
 .globl is_booted_in_hyp
 	is_booted_in_hyp:
+	.skip 4
 #endif
 
 .ltorg
