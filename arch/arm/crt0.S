@@ -268,11 +268,9 @@ warm_boot_tag:
 arm32_hyp_install_and_move_to_svc:
 	ldr		r0,  =hyp_vector
 	mcr             p15, 4, r0, c12, c0, 0	
-	ldr		r0,  =hyp_stack_top
 	ldr		r0,  =is_booted_in_hyp
 	mov		r1,  #1
 	str		r1,  [r0]
-	mov		sp,  r0
 	mrs		r12, cpsr
 	bic		r12, #0x1f      // clear mode bits
 	orr		r12, r12, #0x13 // set mode bits to SVC
@@ -296,10 +294,6 @@ arm32_hyp_install_and_move_to_svc:
 abort_stack:
 	.skip 1024
 abort_stack_top:
-
-hyp_stack:
-        .skip 1024
-hyp_stack_top:
 
 #if SECONDARY_CPU_SUPPORT
 /* secondary cpu stack */
