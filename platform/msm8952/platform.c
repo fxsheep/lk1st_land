@@ -84,6 +84,7 @@ static mmu_section_t mmu_section_table[] = {
 	{    SCRATCH_ADDR,          SCRATCH_ADDR,            511,                    SCRATCH_MEMORY},
 	{    MIPI_FB_ADDR,          MIPI_FB_ADDR,            20,                     COMMON_MEMORY},
 	{    RPMB_SND_RCV_BUF,      RPMB_SND_RCV_BUF,        RPMB_SND_RCV_BUF_SZ,    IOMAP_MEMORY},
+        {    TZ_MEMBASE,  	    TZ_MEMBASE,		     (TZ_MEMSIZE / MB),      COMMON_MEMORY},
 };
 
 void platform_early_init(void)

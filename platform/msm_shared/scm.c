@@ -1280,7 +1280,7 @@ bool is_secure_boot_enable()
 	return secure_boot_enabled;
 }
 
-static uint32_t scm_io_read(addr_t address)
+uint32_t scm_io_read(addr_t address)
 {
 	uint32_t ret;
 	scmcall_arg scm_arg = {0};

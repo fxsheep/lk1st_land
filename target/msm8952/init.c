@@ -329,6 +329,23 @@ void target_init(void)
 	vib_timed_turn_on(VIBRATE_TIME);
 #endif
 
+	//Patch TZ memory on the fly
+
+	//mode switch func, SPSR_EL3 = 0x289
+	if(scm_io_read(0x8650194C) == 0x528050AB)
+		writel(0x5280512B,0x8650194C);
+//		scm_io_write(0x8650194C,0x5280512B);
+	//mode switch func, SCR_EL3 = 0x504
+	if(scm_io_read(0x86501950) == 0x5280808D)
+		writel(0x5280A08D,0x86501950);
+//              scm_io_write(0x86501950,0x5280A08D);
+	//tzbsp smc handler func
+	//probably something that handles return to nonsecure from secure world
+	//Force all returns to EL2, HVC enabled
+        if(scm_io_read(0x8650210C) == 0x54001AC1)
+                writel(0xD280004C,0x8650210C);
+
+
 	if (target_use_signed_kernel())
 		target_crypto_init_params();
 
