@@ -5,6 +5,7 @@
 #include <platform.h>
 #include <dev/fbcon.h>
 #include <target/display.h>
+#include <platform/iomap.h>
 
 #define PIPE_BASE  MDP_VP_0_RGB_0_BASE
 
