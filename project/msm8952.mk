@@ -131,3 +131,5 @@ endif
 
 #enable battery voltage check
 DEFINES += CHECK_BAT_VOLTAGE=1
+
+DISPLAY_USE_CONTINUOUS_SPLASH := 1
